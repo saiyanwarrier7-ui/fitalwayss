@@ -1,0 +1,6 @@
+{
+  "name": "FitAlways - AI Gym Training & Fitness Calculator",
+  "description": "Comprehensive fitness planner with BMR/TDEE calculation, custom workout splits, macro meal planning, and progress tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

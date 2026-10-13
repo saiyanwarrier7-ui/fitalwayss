@@ -1,0 +1,1285 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FitAlways - AI Gym Training & Fitness Calculator</title>
+    <meta name="description" content="Comprehensive fitness planner with BMR/TDEE calculation, custom workout splits, macro meal planning, and progress tracking." />
+    <meta property="og:title" content="FitAlways - AI Gym Training & Fitness Calculator" />
+    <meta property="og:description" content="Comprehensive fitness planner with BMR/TDEE calculation, custom workout splits, macro meal planning, and progress tracking." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <!-- Google Fonts for distinctive athletic display & readable body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- App Container -->
+    <div id="app" class="app-shell">
+      
+      <!-- Top Navigation Bar -->
+      <header class="top-nav">
+        <!-- Zone 1: Wordmark -->
+        <a href="#dashboard" class="brand-link" id="brand-logo">
+          <div class="brand-logo-badge">
+            <svg class="brand-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#FDE047" />
+                  <stop offset="50%" stop-color="#F59E0B" />
+                  <stop offset="100%" stop-color="#B45309" />
+                </linearGradient>
+                <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#EF4444" />
+                  <stop offset="100%" stop-color="#B91C1C" />
+                </linearGradient>
+                <linearGradient id="blackShieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#1C1C24" />
+                  <stop offset="100%" stop-color="#070709" />
+                </linearGradient>
+              </defs>
+              <!-- Deep Obsidian Shield with Metallic Gold Hairline -->
+              <rect x="2" y="2" width="36" height="36" rx="9" fill="url(#blackShieldGrad)" stroke="url(#goldGrad)" stroke-width="1.6" />
+              <!-- Athletic Dumbbell Weight Plates (Gold) -->
+              <rect x="6.5" y="14" width="3.5" height="12" rx="1.5" fill="url(#goldGrad)" />
+              <rect x="30" y="14" width="3.5" height="12" rx="1.5" fill="url(#goldGrad)" />
+              <!-- Gold Connective Bar -->
+              <rect x="9.5" y="18.5" width="21" height="3" rx="1" fill="url(#goldGrad)" />
+              <!-- High-Energy Crimson Flame / Apex Lightning Core (Red) -->
+              <path d="M21.5 8L14 20.5H20.5L18.5 32L26 19.5H19.5L21.5 8Z" fill="url(#redGrad)" />
+            </svg>
+          </div>
+          <span class="brand-name">Fit<span class="text-gold">Always</span></span>
+        </a>
+
+        <!-- Zone 2: Navigation Links -->
+        <nav class="nav-links" id="main-nav">
+          <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+          <button class="nav-btn" data-tab="profile">Profile & Calculator</button>
+          <button class="nav-btn" data-tab="workout">Workout Planner</button>
+          <button class="nav-btn" data-tab="nutrition">Nutrition & Diet</button>
+          <button class="nav-btn" data-tab="progress">Progress Tracker</button>
+          <button class="nav-btn" data-tab="settings">Settings</button>
+        </nav>
+
+        <!-- Zone 3: Primary Action & Controls -->
+        <div class="nav-actions">
+          <!-- Quick Rest Timer Trigger -->
+          <button class="timer-badge-btn" id="open-timer-btn" title="Open Rest Timer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span id="quick-timer-display" class="tabular-nums">00:00</span>
+          </button>
+          
+          <!-- Theme Toggle -->
+          <button class="icon-btn" id="theme-toggle" aria-label="Toggle dark/light theme" title="Toggle Theme">
+            <svg id="moon-icon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <svg id="sun-icon" class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+
+          <!-- Quick Action CTA -->
+          <button class="btn btn-primary btn-sm" id="cta-today-workout">
+            Today's Workout
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Viewport -->
+      <main class="main-content" id="main-viewport">
+        
+        <!-- SECTION 1: DASHBOARD -->
+        <section id="tab-dashboard" class="tab-pane active">
+          <!-- Welcome Hero Banner -->
+          <div class="dashboard-hero">
+            <div class="hero-text-block">
+              <div class="user-greeting">
+                <span class="greeting-subtitle" id="dash-greeting-time">Good day,</span>
+                <h1 class="greeting-name" id="dash-user-name">Athlete</h1>
+              </div>
+              <div class="hero-meta-row">
+                <span id="dash-meta-goal">Muscle Gain</span>
+                <span class="meta-dot">·</span>
+                <span id="dash-meta-split">4-Day Upper / Lower</span>
+                <span class="meta-dot">·</span>
+                <span id="dash-meta-cal">Target: 2,450 kcal</span>
+              </div>
+            </div>
+            
+            <div class="hero-action-buttons">
+              <button class="btn btn-secondary btn-sm" id="btn-quick-log-water">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
+                  <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                </svg>
+                +250ml Water
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btn-quick-log-weight">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
+                  <circle cx="12" cy="12" r="9"/>
+                  <path d="M12 7v5l3 3"/>
+                </svg>
+                Log Weight
+              </button>
+              <button class="btn btn-primary btn-sm" id="btn-start-workout-session">
+                Start Session
+              </button>
+            </div>
+          </div>
+
+          <!-- Primary Metric KPIs (Single elevation, tabular figures) -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Daily Calorie Target</span>
+                <span class="kpi-tag" id="dash-cal-tag">Surplus</span>
+              </div>
+              <div class="kpi-value tabular-nums" id="dash-kpi-calories">2,450 <span class="kpi-unit">kcal</span></div>
+              <div class="kpi-subtext" id="dash-kpi-cal-sub">TDEE: 2,150 kcal · +300 kcal buffer</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Body Mass Index (BMI)</span>
+                <span class="kpi-tag" id="dash-bmi-tag">Normal</span>
+              </div>
+              <div class="kpi-value tabular-nums" id="dash-kpi-bmi">23.4</div>
+              <div class="kpi-subtext" id="dash-kpi-bmi-sub">Height: 178 cm · Weight: 74.0 kg</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Weight Goal Delta</span>
+                <span class="kpi-tag" id="dash-weight-tag">+4.0 kg</span>
+              </div>
+              <div class="kpi-value tabular-nums" id="dash-kpi-weight">74.0 <span class="kpi-unit">→ 78.0 kg</span></div>
+              <div class="kpi-subtext" id="dash-kpi-timeline">Est. ~10–14 weeks at sustainable rate</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">BMR & TDEE</span>
+                <button class="link-btn" id="btn-open-formula-modal">Formula</button>
+              </div>
+              <div class="kpi-value tabular-nums" id="dash-kpi-tdee">2,150 <span class="kpi-unit">TDEE</span></div>
+              <div class="kpi-subtext" id="dash-kpi-bmr-sub">BMR: 1,720 kcal (Mifflin–St Jeor)</div>
+            </div>
+          </div>
+
+          <!-- Daily Status & Habit Trackers Grid -->
+          <div class="dashboard-split-grid">
+            <!-- Left Column: Nutrition Progress & Water/Sleep -->
+            <div class="card">
+              <div class="card-head">
+                <h2 class="card-title">Daily Nutrition & Macros</h2>
+                <button class="link-btn" data-tab="nutrition">Open Meal Planner →</button>
+              </div>
+
+              <!-- Macro Progress Bars -->
+              <div class="macro-bars-list">
+                <div class="macro-bar-item">
+                  <div class="macro-label-row">
+                    <span class="macro-name">Protein (4 kcal/g)</span>
+                    <span class="macro-nums tabular-nums" id="dash-macro-protein-text">145g / 165g</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill fill-emerald" id="dash-macro-protein-bar" style="width: 88%;"></div>
+                  </div>
+                </div>
+
+                <div class="macro-bar-item">
+                  <div class="macro-label-row">
+                    <span class="macro-name">Carbohydrates (4 kcal/g)</span>
+                    <span class="macro-nums tabular-nums" id="dash-macro-carbs-text">240g / 270g</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill fill-cyan" id="dash-macro-carbs-bar" style="width: 89%;"></div>
+                  </div>
+                </div>
+
+                <div class="macro-bar-item">
+                  <div class="macro-label-row">
+                    <span class="macro-name">Healthy Fats (9 kcal/g)</span>
+                    <span class="macro-nums tabular-nums" id="dash-macro-fat-text">62g / 70g</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill fill-amber" id="dash-macro-fat-bar" style="width: 88%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Water & Sleep Row -->
+              <div class="daily-habits-grid">
+                <div class="habit-box">
+                  <div class="habit-header">
+                    <span class="habit-title">Hydration Guidance</span>
+                    <span class="habit-stat tabular-nums" id="dash-water-count">2,250 / 3,000 ml</span>
+                  </div>
+                  <div class="habit-progress-bar">
+                    <div class="progress-track">
+                      <div class="progress-fill fill-cyan" id="dash-water-bar" style="width: 75%;"></div>
+                    </div>
+                  </div>
+                  <div class="habit-actions">
+                    <button class="btn btn-subtle btn-xs" id="dash-water-add-cup">+1 Cup (250ml)</button>
+                    <button class="btn btn-subtle btn-xs" id="dash-water-add-bottle">+500ml</button>
+                    <button class="btn btn-subtle btn-xs text-muted" id="dash-water-reset">Reset</button>
+                  </div>
+                </div>
+
+                <div class="habit-box">
+                  <div class="habit-header">
+                    <span class="habit-title">Sleep & Recovery</span>
+                    <span class="habit-stat tabular-nums" id="dash-sleep-count">7.5 hrs / 8.0 target</span>
+                  </div>
+                  <div class="sleep-input-row">
+                    <label for="dash-sleep-input" class="text-xs text-muted">Log last night:</label>
+                    <input type="number" id="dash-sleep-input" min="3" max="14" step="0.5" value="7.5" class="input-xs" />
+                    <button class="btn btn-subtle btn-xs" id="dash-sleep-save">Save</button>
+                  </div>
+                  <div class="habit-tip" id="dash-recovery-tip">Optimal CNS recovery occurs at 7–9 hrs.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Today's Scheduled Workout & Quick Log -->
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h2 class="card-title">Today's Workout</h2>
+                  <div class="card-subtitle" id="dash-workout-subtitle">Day 1 · Upper Body Strength A</div>
+                </div>
+                <button class="link-btn" data-tab="workout">Full Workout Split →</button>
+              </div>
+
+              <div class="today-exercise-preview-list" id="dash-today-exercises">
+                <!-- Rendered dynamically -->
+              </div>
+
+              <div class="card-footer-action">
+                <div class="completion-stat">
+                  <span class="text-xs text-muted">Weekly Completion:</span>
+                  <span class="text-xs font-semibold tabular-nums" id="dash-weekly-completion">75% (3 of 4 done)</span>
+                </div>
+                <button class="btn btn-primary btn-sm" id="btn-dash-jump-workout">Open & Log Workout</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Section -->
+          <div class="charts-section">
+            <div class="section-heading-row">
+              <h2 class="section-title">Visual Analytics & Performance Trends</h2>
+              <div class="segmented-control" id="chart-timeframe-control">
+                <button class="segment-btn active" data-days="7">7 Days</button>
+                <button class="segment-btn" data-days="30">30 Days</button>
+                <button class="segment-btn" data-days="90">90 Days</button>
+              </div>
+            </div>
+
+            <div class="charts-grid">
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h3 class="chart-title">Body Weight Trend vs Target</h3>
+                  <span class="text-xs text-muted tabular-nums" id="chart-weight-delta-note">Target: 78.0 kg</span>
+                </div>
+                <div class="chart-canvas-wrapper">
+                  <canvas id="chart-weight-history"></canvas>
+                </div>
+              </div>
+
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h3 class="chart-title">Daily Calorie Intake vs Target</h3>
+                  <span class="text-xs text-muted tabular-nums" id="chart-cal-target-note">Target: 2,450 kcal</span>
+                </div>
+                <div class="chart-canvas-wrapper">
+                  <canvas id="chart-calories-history"></canvas>
+                </div>
+              </div>
+
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h3 class="chart-title">Macronutrient Distribution Target</h3>
+                  <span class="text-xs text-muted">Ratio %</span>
+                </div>
+                <div class="chart-canvas-wrapper chart-donut-wrapper">
+                  <canvas id="chart-macro-donut"></canvas>
+                </div>
+              </div>
+
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h3 class="chart-title">Strength Progression (Estimated 1RM / Top Set)</h3>
+                  <select id="chart-lift-selector" class="select-xs">
+                    <option value="bench">Barbell Bench Press</option>
+                    <option value="squat">Barbell Back Squat</option>
+                    <option value="deadlift">Deadlift</option>
+                    <option value="ohp">Overhead Press</option>
+                  </select>
+                </div>
+                <div class="chart-canvas-wrapper">
+                  <canvas id="chart-strength-history"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 2: PROFILE & FITNESS CALCULATOR -->
+        <section id="tab-profile" class="tab-pane">
+          <div class="section-header-banner">
+            <div>
+              <h1 class="page-headline">Fitness Profile & Scientific Calculator</h1>
+              <p class="page-description">Enter your personal metrics to generate certified metabolic calculations (BMR, TDEE), macro distributions, and customized workout splits.</p>
+            </div>
+            <div class="header-action-group">
+              <button class="btn btn-secondary btn-sm" id="btn-load-demo-profile">Load Sample Profile</button>
+              <button class="btn btn-subtle btn-sm text-muted" id="btn-reset-form">Clear</button>
+            </div>
+          </div>
+
+          <div class="profile-split-container">
+            <!-- Left Column: Comprehensive Form -->
+            <form id="fitness-profile-form" class="card form-card">
+              <h2 class="card-title mb-4">1. Personal & Body Metrics</h2>
+              
+              <!-- Units Toggle -->
+              <div class="unit-toggle-row">
+                <span class="field-label">Measurement Units</span>
+                <div class="segmented-control" id="unit-system-toggle">
+                  <button type="button" class="segment-btn active" data-unit="metric">Metric (kg, cm)</button>
+                  <button type="button" class="segment-btn" data-unit="imperial">Imperial (lbs, ft/in)</button>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <!-- Name -->
+                <div class="form-group">
+                  <label for="input-name" class="form-label">Full Name or Nickname <span class="required">*</span></label>
+                  <input type="text" id="input-name" class="form-input" placeholder="e.g. Alex" required />
+                </div>
+
+                <!-- Age -->
+                <div class="form-group">
+                  <label for="input-age" class="form-label">Age (years) <span class="required">*</span></label>
+                  <input type="number" id="input-age" class="form-input" min="14" max="100" placeholder="e.g. 26" required />
+                </div>
+
+                <!-- Sex -->
+                <div class="form-group">
+                  <label for="input-sex" class="form-label">Biological Sex (for Mifflin–St Jeor) <span class="required">*</span></label>
+                  <select id="input-sex" class="form-select" required>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </div>
+
+                <!-- Height Metric -->
+                <div class="form-group unit-metric-group">
+                  <label for="input-height-cm" class="form-label">Height (cm) <span class="required">*</span></label>
+                  <input type="number" id="input-height-cm" class="form-input" min="100" max="250" placeholder="e.g. 178" />
+                </div>
+
+                <!-- Height Imperial -->
+                <div class="form-group unit-imperial-group hidden">
+                  <label class="form-label">Height (ft & in) <span class="required">*</span></label>
+                  <div class="flex-input-row">
+                    <input type="number" id="input-height-ft" class="form-input" min="3" max="8" placeholder="5 ft" />
+                    <input type="number" id="input-height-in" class="form-input" min="0" max="11" placeholder="10 in" />
+                  </div>
+                </div>
+
+                <!-- Weight Metric -->
+                <div class="form-group unit-metric-group">
+                  <label for="input-weight-kg" class="form-label">Current Weight (kg) <span class="required">*</span></label>
+                  <input type="number" id="input-weight-kg" class="form-input" min="30" max="250" step="0.1" placeholder="e.g. 74.0" />
+                </div>
+
+                <!-- Weight Imperial -->
+                <div class="form-group unit-imperial-group hidden">
+                  <label for="input-weight-lbs" class="form-label">Current Weight (lbs) <span class="required">*</span></label>
+                  <input type="number" id="input-weight-lbs" class="form-input" min="65" max="550" step="0.1" placeholder="e.g. 163.0" />
+                </div>
+
+                <!-- Target Weight Metric -->
+                <div class="form-group unit-metric-group">
+                  <label for="input-target-weight-kg" class="form-label">Target Weight (kg) <span class="required">*</span></label>
+                  <input type="number" id="input-target-weight-kg" class="form-input" min="30" max="250" step="0.1" placeholder="e.g. 78.0" />
+                </div>
+
+                <!-- Target Weight Imperial -->
+                <div class="form-group unit-imperial-group hidden">
+                  <label for="input-target-weight-lbs" class="form-label">Target Weight (lbs) <span class="required">*</span></label>
+                  <input type="number" id="input-target-weight-lbs" class="form-input" min="65" max="550" step="0.1" placeholder="e.g. 172.0" />
+                </div>
+
+                <!-- Body Fat % (Optional) -->
+                <div class="form-group">
+                  <label for="input-bodyfat" class="form-label">Body Fat % <span class="optional-badge">Optional</span></label>
+                  <input type="number" id="input-bodyfat" class="form-input" min="3" max="60" step="0.5" placeholder="e.g. 16.0 (leaves blank if unknown)" />
+                </div>
+
+                <!-- Fitness Goal -->
+                <div class="form-group">
+                  <label for="input-goal" class="form-label">Primary Fitness Goal <span class="required">*</span></label>
+                  <select id="input-goal" class="form-select" required>
+                    <option value="fat_loss">Fat Loss (Sustainable Deficit)</option>
+                    <option value="muscle_gain" selected>Muscle Gain (Lean Bulk Surplus)</option>
+                    <option value="recomp">Body Recomposition (Maintenance / High Protein)</option>
+                    <option value="strength">Strength Building (Power & CNS)</option>
+                    <option value="general_fitness">General Fitness & Endurance</option>
+                    <option value="maintenance">Weight Maintenance</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-divider"></div>
+              <h2 class="card-title mb-4">2. Training & Routine Specifications</h2>
+
+              <div class="form-grid">
+                <!-- Experience -->
+                <div class="form-group">
+                  <label for="input-experience" class="form-label">Experience Level <span class="required">*</span></label>
+                  <select id="input-experience" class="form-select" required>
+                    <option value="beginner">Beginner (&lt; 1 year consistent)</option>
+                    <option value="intermediate" selected>Intermediate (1–3 years)</option>
+                    <option value="advanced">Advanced (3+ years solid training)</option>
+                  </select>
+                </div>
+
+                <!-- Days per week -->
+                <div class="form-group">
+                  <label for="input-days" class="form-label">Training Days per Week <span class="required">*</span></label>
+                  <select id="input-days" class="form-select" required>
+                    <option value="1">1 Day / week (Full Body Condensed)</option>
+                    <option value="2">2 Days / week (Full Body A/B)</option>
+                    <option value="3">3 Days / week (Full Body 3x)</option>
+                    <option value="4" selected>4 Days / week (Upper / Lower Split)</option>
+                    <option value="5">5 Days / week (Upper / Lower / PPL Hybrid)</option>
+                    <option value="6">6 Days / week (Push / Pull / Legs x 2)</option>
+                    <option value="7">7 Days / week (Lifting + Active Mobility)</option>
+                  </select>
+                </div>
+
+                <!-- Duration -->
+                <div class="form-group">
+                  <label for="input-duration" class="form-label">Session Duration <span class="required">*</span></label>
+                  <select id="input-duration" class="form-select" required>
+                    <option value="30">30 minutes (High Density)</option>
+                    <option value="45">45 minutes</option>
+                    <option value="60" selected>60 minutes (Standard Optimal)</option>
+                    <option value="75">75 minutes</option>
+                    <option value="90">90 minutes (Advanced Volume)</option>
+                  </select>
+                </div>
+
+                <!-- Activity Level -->
+                <div class="form-group">
+                  <label for="input-activity" class="form-label">Non-Gym Activity Level <span class="required">*</span></label>
+                  <select id="input-activity" class="form-select" required>
+                    <option value="1.2">Sedentary (Desk job, little movement)</option>
+                    <option value="1.375" selected>Lightly Active (1–3k daily steps / light chores)</option>
+                    <option value="1.55">Moderately Active (6–10k steps / active day)</option>
+                    <option value="1.725">Very Active (12k+ steps / heavy physical job)</option>
+                    <option value="1.9">Extremely Active (Labor worker + dual training)</option>
+                  </select>
+                </div>
+
+                <!-- Location -->
+                <div class="form-group">
+                  <label for="input-location" class="form-label">Preferred Location</label>
+                  <select id="input-location" class="form-select">
+                    <option value="gym" selected>Commercial / Full Gym</option>
+                    <option value="home">Home Workout</option>
+                  </select>
+                </div>
+
+                <!-- Equipment -->
+                <div class="form-group">
+                  <label for="input-equipment" class="form-label">Available Equipment <span class="required">*</span></label>
+                  <select id="input-equipment" class="form-select" required>
+                    <option value="full_gym" selected>Full Gym (Barbells, Dumbbells, Cables, Machines)</option>
+                    <option value="barbell_rack">Barbell & Squat Rack + Bench</option>
+                    <option value="dumbbells_only">Dumbbells Only & Adjustable Bench</option>
+                    <option value="resistance_bands">Resistance Bands & Pull-up Bar</option>
+                    <option value="bodyweight">Bodyweight Only (Calisthenics)</option>
+                    <option value="kettlebells">Kettlebells & Floor Space</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-divider"></div>
+              <h2 class="card-title mb-4">3. Nutrition & Lifestyle Preferences</h2>
+
+              <div class="form-grid">
+                <!-- Diet Preference -->
+                <div class="form-group">
+                  <label for="input-diet" class="form-label">Dietary Preference <span class="required">*</span></label>
+                  <select id="input-diet" class="form-select" required>
+                    <option value="non_veg" selected>Non-Vegetarian (Poultry, Fish, Eggs, Dairy, Plant)</option>
+                    <option value="vegetarian">Vegetarian (Dairy, Legumes, Tofu, Grains)</option>
+                    <option value="eggetarian">Eggetarian (Eggs, Dairy, Plant foods)</option>
+                    <option value="vegan">Vegan (100% Plant-Based)</option>
+                    <option value="indian">Indian Traditional (Roti, Dal, Paneer, Curd, Rice)</option>
+                  </select>
+                </div>
+
+                <!-- Allergies -->
+                <div class="form-group">
+                  <label for="input-allergies" class="form-label">Allergies / Restrictions</label>
+                  <input type="text" id="input-allergies" class="form-input" placeholder="e.g. Dairy-free, Nut allergy, Gluten-free, or None" />
+                </div>
+
+                <!-- Meals per day -->
+                <div class="form-group">
+                  <label for="input-meals" class="form-label">Preferred Meals per Day</label>
+                  <select id="input-meals" class="form-select">
+                    <option value="3">3 Meals (Breakfast, Lunch, Dinner)</option>
+                    <option value="4" selected>4 Meals (Breakfast, Lunch, Snack, Dinner)</option>
+                    <option value="5">5 Meals (Frequent Smaller Feedings)</option>
+                  </select>
+                </div>
+
+                <!-- Daily Sleep -->
+                <div class="form-group">
+                  <label for="input-sleep" class="form-label">Avg Daily Sleep (hours) <span class="required">*</span></label>
+                  <input type="number" id="input-sleep" class="form-input" min="4" max="14" step="0.5" value="7.5" required />
+                </div>
+
+                <!-- Injuries / Limitations -->
+                <div class="form-group full-width">
+                  <label for="input-injuries" class="form-label">Injuries or Physical Limitations (Optional)</label>
+                  <input type="text" id="input-injuries" class="form-input" placeholder="e.g. Mild lower back sensitivity, avoid behind-neck presses, knee pain" />
+                </div>
+              </div>
+
+              <div class="form-actions-row">
+                <button type="submit" class="btn btn-primary btn-lg" id="btn-submit-profile">
+                  Calculate & Generate Fitness Plan
+                </button>
+              </div>
+            </form>
+
+            <!-- Right Column: Live Calculated Scientific Breakdown -->
+            <div class="card calculation-results-card" id="calc-results-panel">
+              <div class="card-head">
+                <h2 class="card-title">Scientific Calculation Report</h2>
+                <span class="report-badge">Mifflin–St Jeor Standard</span>
+              </div>
+
+              <!-- Metrics Breakdown Accordion / List -->
+              <div class="calc-metrics-list">
+                
+                <!-- BMR Breakdown -->
+                <div class="calc-metric-box">
+                  <div class="calc-metric-header">
+                    <div>
+                      <div class="calc-metric-title">Basal Metabolic Rate (BMR)</div>
+                      <div class="calc-formula-desc" id="calc-bmr-formula-text">Mifflin-St Jeor: 10×W + 6.25×H - 5×A + 5</div>
+                    </div>
+                    <div class="calc-metric-val tabular-nums" id="res-bmr">1,720 kcal/day</div>
+                  </div>
+                  <p class="calc-explanation">Energy expended by your body at complete rest to sustain vital organs, brain, and involuntary cellular functions.</p>
+                </div>
+
+                <!-- TDEE Breakdown -->
+                <div class="calc-metric-box">
+                  <div class="calc-metric-header">
+                    <div>
+                      <div class="calc-metric-title">Total Daily Energy Expenditure (TDEE)</div>
+                      <div class="calc-formula-desc" id="calc-tdee-formula-text">BMR × 1.375 (Lightly Active multiplier)</div>
+                    </div>
+                    <div class="calc-metric-val tabular-nums" id="res-tdee">2,365 kcal/day</div>
+                  </div>
+                  <p class="calc-explanation">Estimated daily burn including baseline BMR, non-exercise movement (NEAT), and thermal effect of food digestion.</p>
+                </div>
+
+                <!-- Calorie Target Breakdown -->
+                <div class="calc-metric-box highlight-box">
+                  <div class="calc-metric-header">
+                    <div>
+                      <div class="calc-metric-title">Prescribed Daily Calorie Target</div>
+                      <div class="calc-formula-desc" id="calc-target-formula-text">Goal Adjustment: +300 kcal Lean Bulk Surplus</div>
+                    </div>
+                    <div class="calc-metric-val text-accent tabular-nums" id="res-calorie-target">2,450 kcal/day</div>
+                  </div>
+                  <p class="calc-explanation">Provides surplus fuel for muscle hypertrophy while mitigating disproportionate adipose tissue gain.</p>
+                </div>
+
+                <!-- BMI & Body Composition -->
+                <div class="calc-metric-box">
+                  <div class="calc-metric-header">
+                    <div>
+                      <div class="calc-metric-title">BMI & Body Composition</div>
+                      <div class="calc-formula-desc" id="calc-bmi-formula-text">BMI = 74.0 kg / (1.78 m)² = 23.4</div>
+                    </div>
+                    <div class="calc-metric-val tabular-nums" id="res-bmi">23.4 (Normal)</div>
+                  </div>
+                  <div class="composition-row" id="calc-composition-breakdown">
+                    <span class="text-xs text-muted">Lean Body Mass: <strong class="tabular-nums" id="res-lbm">62.2 kg</strong></span>
+                    <span class="meta-dot">·</span>
+                    <span class="text-xs text-muted">Fat Mass: <strong class="tabular-nums" id="res-fatmass">11.8 kg</strong></span>
+                    <span class="meta-dot">·</span>
+                    <span class="text-xs text-muted">Body Fat: <strong class="tabular-nums" id="res-bf">16.0%</strong></span>
+                  </div>
+                </div>
+
+                <!-- Estimated Progress Timeline -->
+                <div class="calc-metric-box">
+                  <div class="calc-metric-header">
+                    <div>
+                      <div class="calc-metric-title">Estimated Progress Timeline</div>
+                      <div class="calc-formula-desc">Target Weight Delta: <span id="res-weight-delta">4.0 kg to gain</span></div>
+                    </div>
+                    <div class="calc-metric-val tabular-nums" id="res-timeline">~12–16 weeks</div>
+                  </div>
+                  <p class="calc-explanation">Cautious projection based on sustainable physiology (~0.25–0.35 kg/week lean tissue accrual for intermediates). Individual genetics, training adherence, and sleep modulate this.</p>
+                </div>
+
+                <!-- Hydration Guidance -->
+                <div class="calc-metric-box">
+                  <div class="calc-metric-header">
+                    <div>
+                      <div class="calc-metric-title">Hydration Guidance</div>
+                      <div class="calc-formula-desc">35ml/kg baseline + 600ml training supplement</div>
+                    </div>
+                    <div class="calc-metric-val tabular-nums" id="res-hydration">3.2 Liters/day</div>
+                  </div>
+                  <p class="calc-explanation">General fluid estimate. Increase during hot ambient climate, elevated sweat rate, or strenuous endurance training.</p>
+                </div>
+
+                <!-- Training Volume & Recovery -->
+                <div class="calc-metric-box">
+                  <div class="calc-metric-header">
+                    <div>
+                      <div class="calc-metric-title">Weekly Volume & Recovery</div>
+                      <div class="calc-formula-desc" id="res-volume-desc">Intermediate: 12–16 sets / muscle group / week</div>
+                    </div>
+                    <div class="calc-metric-val tabular-nums" id="res-rest-days">3 Rest Days</div>
+                  </div>
+                  <p class="calc-explanation">Distributes weekly mechanical tension evenly to balance motor unit fatigue, protein synthesis cycles, and central nervous system recovery.</p>
+                </div>
+              </div>
+
+              <!-- Safety & Medical Disclaimer -->
+              <div class="safety-caution-card">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="caution-icon">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <div class="caution-body">
+                  <strong>Important Safety & Medical Notice:</strong>
+                  Calculations, caloric targets, and training splits are estimated guidelines. They do not constitute medical diagnosis or clinical prescription. Consult a physician before beginning any strenuous lifting protocol if you are pregnant, a minor, have cardiovascular conditions, or a history of eating disorders. Never lift through sharp articular pain.
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 3: PERSONALIZED WORKOUT PLANNER -->
+        <section id="tab-workout" class="tab-pane">
+          <!-- Workout Header Banner -->
+          <div class="section-header-banner">
+            <div>
+              <div class="badge-kicker" id="workout-split-tag">4-Day Split · Upper / Lower Focus</div>
+              <h1 class="page-headline" id="workout-plan-title">Personalized Weekly Workout Schedule</h1>
+              <p class="page-description" id="workout-plan-desc">Structured to balance compound mechanical tension, isolation hypertrophy, and recovery based on your equipment and schedule.</p>
+            </div>
+            
+            <!-- Stopwatch & Session Controller -->
+            <div class="workout-session-widget">
+              <div class="timer-display-box">
+                <span class="timer-label">SESSION CLOCK</span>
+                <span class="timer-clock tabular-nums" id="session-clock-display">00:00:00</span>
+              </div>
+              <div class="timer-controls">
+                <button class="btn btn-secondary btn-sm" id="btn-session-start">Start</button>
+                <button class="btn btn-subtle btn-sm text-muted" id="btn-session-reset">Reset</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Days Tabs Segmented Control -->
+          <div class="workout-days-nav-wrapper">
+            <div class="workout-days-nav" id="workout-day-selector">
+              <!-- Rendered dynamically e.g. Day 1: Upper A, Day 2: Lower A, Day 3: Rest, etc. -->
+            </div>
+          </div>
+
+          <!-- Active Day Workout Container -->
+          <div class="workout-day-container" id="active-workout-container">
+            
+            <!-- Routine Intro Meta -->
+            <div class="routine-meta-card">
+              <div class="routine-meta-left">
+                <h2 class="routine-title" id="active-day-title">Day 1: Upper Body Strength & Hypertrophy A</h2>
+                <div class="routine-meta-sub">
+                  <span id="active-day-focus">Chest, Back, Shoulders, Arms</span>
+                  <span class="meta-dot">·</span>
+                  <span id="active-day-duration">Est. 60 min</span>
+                  <span class="meta-dot">·</span>
+                  <span id="active-day-sets-total">20 Working Sets</span>
+                </div>
+              </div>
+              
+              <div class="routine-meta-right">
+                <div class="day-completion-indicator">
+                  <span class="text-xs text-muted">Status:</span>
+                  <span class="completion-pill" id="active-day-status-pill">Pending</span>
+                </div>
+                <button class="btn btn-primary btn-sm" id="btn-complete-day-workout">
+                  Mark Day Completed
+                </button>
+              </div>
+            </div>
+
+            <!-- Warm-up Guidance Box -->
+            <div class="warmup-cooldown-box" id="warmup-box">
+              <div class="warmup-header">
+                <div class="flex items-center gap-2">
+                  <span class="phase-tag">Warm-Up (5–8 Min)</span>
+                  <span class="text-sm font-semibold">Dynamic Joint Mobility & CNS Priming</span>
+                </div>
+                <button class="toggle-btn text-xs" id="btn-toggle-warmup">Show Routine</button>
+              </div>
+              <div class="warmup-body" id="warmup-content">
+                <ul class="routine-steps-list">
+                  <li><strong>Arm Circles & Band Dislocates:</strong> 2 sets of 15 reps to lubricate rotator cuff and glenohumeral capsule.</li>
+                  <li><strong>Cat-Cow & Thoracic Rotations:</strong> 10 slow reps focusing on mid-back extension and scapular glide.</li>
+                  <li><strong>Band Pull-Aparts / Face Pulls:</strong> 2 sets of 15 light reps to activate lower trapezius and rear deltoids.</li>
+                  <li><strong>Pyramid Warm-Up Sets:</strong> Perform 2 light sets with empty bar/light dumbbells before loading working weight.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Exercises List -->
+            <div class="exercises-stack" id="exercises-list-stack">
+              <!-- Exercise cards rendered via vanilla JS -->
+            </div>
+
+            <!-- Cool-down Guidance Box -->
+            <div class="warmup-cooldown-box" id="cooldown-box">
+              <div class="warmup-header">
+                <div class="flex items-center gap-2">
+                  <span class="phase-tag">Cool-Down (5 Min)</span>
+                  <span class="text-sm font-semibold">Static Stretching & Parasympathetic Downregulation</span>
+                </div>
+                <button class="toggle-btn text-xs" id="btn-toggle-cooldown">Show Routine</button>
+              </div>
+              <div class="warmup-body" id="cooldown-content">
+                <ul class="routine-steps-list">
+                  <li><strong>Doorway Pec Stretch:</strong> 45 seconds each side to relax anterior chest wall.</li>
+                  <li><strong>Lat & Overhead Tricep Stretch:</strong> 45 seconds per arm against upright pillar.</li>
+                  <li><strong>Box Breathing:</strong> 2 minutes of 4-second inhale, 4-second hold, 4-second exhale to accelerate nervous system recovery.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Progressive Overload Coaching Tip Box -->
+            <div class="overload-coach-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="coach-icon">
+                <path d="M18 20V10M12 20V4M6 20v-6"></path>
+              </svg>
+              <div>
+                <h3 class="coach-title">FitAlways Progressive Overload Principle</h3>
+                <p class="coach-text">When you can successfully perform all prescribed sets at the top rep ceiling (e.g. 3 sets of 12 reps) with pristine technique and $\le 2$ reps in reserve (RIR), add 2.5 kg (5 lbs) on upper body or 5 kg (10 lbs) on lower body for the subsequent session. Never compromise posture or form to inflate poundage.</p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- SECTION 4: NUTRITION & MACRO PLANNER -->
+        <section id="tab-nutrition" class="tab-pane">
+          <div class="section-header-banner">
+            <div>
+              <div class="badge-kicker">Custom Meal & Fuel Plan</div>
+              <h1 class="page-headline">Daily Nutrition & Macronutrient Architecture</h1>
+              <p class="page-description">Portion-controlled daily menu calibrated to your caloric and macronutrient targets. Adjust portion weights to instantly recalculate totals.</p>
+            </div>
+            
+            <div class="header-action-group">
+              <button class="btn btn-secondary btn-sm" id="btn-quick-indian-diet">
+                Switch to Indian Food Plan
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btn-add-custom-food-modal">
+                + Add Custom Food
+              </button>
+            </div>
+          </div>
+
+          <!-- Target vs Planned Comparison KPI Bar -->
+          <div class="card comparison-banner">
+            <div class="comparison-grid">
+              <div class="comp-col">
+                <span class="comp-label">Daily Calories</span>
+                <div class="comp-val tabular-nums">
+                  <span id="nutri-total-calories">2,440</span>
+                  <span class="comp-target">/ <span id="nutri-target-calories">2,450</span> kcal</span>
+                </div>
+                <div class="comp-delta tabular-nums" id="nutri-cal-delta">-10 kcal (On Target)</div>
+              </div>
+
+              <div class="comp-col">
+                <span class="comp-label">Protein</span>
+                <div class="comp-val tabular-nums">
+                  <span id="nutri-total-protein">166g</span>
+                  <span class="comp-target">/ <span id="nutri-target-protein">165g</span> target</span>
+                </div>
+                <div class="comp-delta tabular-nums text-emerald" id="nutri-protein-delta">+1g (Optimal)</div>
+              </div>
+
+              <div class="comp-col">
+                <span class="comp-label">Carbohydrates</span>
+                <div class="comp-val tabular-nums">
+                  <span id="nutri-total-carbs">268g</span>
+                  <span class="comp-target">/ <span id="nutri-target-carbs">270g</span> target</span>
+                </div>
+                <div class="comp-delta tabular-nums" id="nutri-carbs-delta">-2g</div>
+              </div>
+
+              <div class="comp-col">
+                <span class="comp-label">Fats</span>
+                <div class="comp-val tabular-nums">
+                  <span id="nutri-total-fat">69g</span>
+                  <span class="comp-target">/ <span id="nutri-target-fat">70g</span> target</span>
+                </div>
+                <div class="comp-delta tabular-nums" id="nutri-fat-delta">-1g</div>
+              </div>
+
+              <div class="comp-col">
+                <span class="comp-label">Dietary Fiber</span>
+                <div class="comp-val tabular-nums">
+                  <span id="nutri-total-fiber">34g</span>
+                  <span class="comp-target">/ 32g min</span>
+                </div>
+                <div class="comp-delta tabular-nums text-emerald">Healthy gut motility</div>
+              </div>
+            </div>
+
+            <!-- Interactive Macro Ratio Adjuster (Collapsible) -->
+            <div class="macro-adjuster-bar">
+              <div class="flex items-center justify-between w-full">
+                <span class="text-xs text-muted">Adjust Macro Ratios:</span>
+                <div class="flex items-center gap-4 text-xs font-mono">
+                  <span>Protein: <strong id="ratio-p-val">27%</strong></span>
+                  <span>Carbs: <strong id="ratio-c-val">45%</strong></span>
+                  <span>Fat: <strong id="ratio-f-val">28%</strong></span>
+                  <button class="btn btn-subtle btn-xs" id="btn-rebalance-macros">Auto-Balance</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Meals Stack (Breakfast, Lunch, Dinner, Snacks) -->
+          <div class="meals-stack" id="meal-plan-container">
+            <!-- Meal cards rendered dynamically -->
+          </div>
+
+          <div class="meal-plan-footer-actions">
+            <button class="btn btn-primary btn-md" id="btn-log-day-meals">
+              Log Today's Meals to Progress Tracker
+            </button>
+            <button class="btn btn-secondary btn-md" id="btn-reset-meal-plan">
+              Reset to Recommended Template
+            </button>
+          </div>
+        </section>
+
+        <!-- SECTION 5: PROGRESS TRACKER & LOGS -->
+        <section id="tab-progress" class="tab-pane">
+          <div class="section-header-banner">
+            <div>
+              <div class="badge-kicker">Longitudinal History</div>
+              <h1 class="page-headline">Progress Tracker & Measurement Logs</h1>
+              <p class="page-description">Record weigh-ins, anthropometric measurements, and strength personal records. Monitor trends over 7, 30, and 90 days.</p>
+            </div>
+            
+            <button class="btn btn-primary btn-sm" id="btn-open-log-modal">
+              + New Progress Entry
+            </button>
+          </div>
+
+          <!-- Summary KPI Strip -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <span class="kpi-label">Total Weight Change</span>
+              <div class="kpi-value tabular-nums" id="prog-total-change">-0.0 kg</div>
+              <div class="kpi-subtext" id="prog-change-note">Since initial profile check-in</div>
+            </div>
+
+            <div class="kpi-card">
+              <span class="kpi-label">Logged Entries</span>
+              <div class="kpi-value tabular-nums" id="prog-total-entries">14 Days</div>
+              <div class="kpi-subtext">Active logging consistency</div>
+            </div>
+
+            <div class="kpi-card">
+              <span class="kpi-label">Workouts Logged</span>
+              <div class="kpi-value tabular-nums" id="prog-workouts-done">11 Sessions</div>
+              <div class="kpi-subtext">85% adherence rate</div>
+            </div>
+
+            <div class="kpi-card">
+              <span class="kpi-label">Avg Daily Calories</span>
+              <div class="kpi-value tabular-nums" id="prog-avg-cals">2,410 kcal</div>
+              <div class="kpi-subtext">Within ±2% of target</div>
+            </div>
+          </div>
+
+          <!-- Entries Table Card -->
+          <div class="card mt-6">
+            <div class="card-head">
+              <div class="flex items-center gap-3">
+                <h2 class="card-title">Historical Log Entries</h2>
+                <div class="segmented-control" id="table-filter-timeframe">
+                  <button class="segment-btn active" data-days="all">All</button>
+                  <button class="segment-btn" data-days="90">90D</button>
+                  <button class="segment-btn" data-days="30">30D</button>
+                  <button class="segment-btn" data-days="7">7D</button>
+                </div>
+              </div>
+              <span class="text-xs text-muted" id="table-entry-count">Showing 14 entries</span>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table" id="progress-history-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Weight</th>
+                    <th>Body Fat</th>
+                    <th>Waist / Chest / Arms</th>
+                    <th>Calories / Protein</th>
+                    <th>Workout Completed</th>
+                    <th class="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="progress-table-body">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 6: SETTINGS & BACKUP -->
+        <section id="tab-settings" class="tab-pane">
+          <div class="section-header-banner">
+            <div>
+              <h1 class="page-headline">Settings & Data Governance</h1>
+              <p class="page-description">Configure interface preferences, timer audio alarms, and securely export or restore your localStorage profile and logs.</p>
+            </div>
+          </div>
+
+          <div class="settings-grid">
+            <!-- App Preferences Card -->
+            <div class="card">
+              <h2 class="card-title mb-4">Application Preferences</h2>
+              
+              <div class="settings-row">
+                <div>
+                  <div class="settings-item-title">Default Units of Measurement</div>
+                  <div class="settings-item-desc">Choose between Metric (kg, cm) and Imperial (lbs, ft/in).</div>
+                </div>
+                <div class="segmented-control" id="settings-units-control">
+                  <button class="segment-btn active" data-unit="metric">Metric</button>
+                  <button class="segment-btn" data-unit="imperial">Imperial</button>
+                </div>
+              </div>
+
+              <div class="settings-row">
+                <div>
+                  <div class="settings-item-title">Rest Timer Audio Beeps</div>
+                  <div class="settings-item-desc">Play clean sound frequency when rest interval ends.</div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="settings-audio-toggle" checked />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+
+              <div class="settings-row">
+                <div>
+                  <div class="settings-item-title">Color Theme</div>
+                  <div class="settings-item-desc">Toggle between high-contrast Dark Slate and Crisp Light mode.</div>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="settings-theme-btn">
+                  Switch Theme
+                </button>
+              </div>
+            </div>
+
+            <!-- Backup & Restore Card -->
+            <div class="card">
+              <h2 class="card-title mb-4">Data Backup & Portability</h2>
+              <p class="text-sm text-muted mb-4">All application metrics, logged workouts, and custom meal templates reside entirely in your browser's private localStorage. No unencrypted remote servers or tracking telemetry.</p>
+
+              <div class="backup-actions-grid">
+                <button class="btn btn-secondary btn-md" id="btn-export-json">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Export Data (JSON)
+                </button>
+
+                <label class="btn btn-secondary btn-md cursor-pointer">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <span>Import Data (JSON)</span>
+                  <input type="file" id="file-import-json" accept=".json" class="hidden" />
+                </label>
+              </div>
+
+              <div class="form-divider"></div>
+
+              <div class="danger-zone">
+                <div class="danger-zone-text">
+                  <span class="font-semibold text-danger">Reset All Profile & History Data</span>
+                  <p class="text-xs text-muted">Permanently wipes current user records and returns to default sample state.</p>
+                </div>
+                <button class="btn btn-danger btn-sm" id="btn-wipe-data">Reset All Data</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- REST TIMER FLOATING / POPUP DRAWER -->
+      <div id="rest-timer-drawer" class="timer-drawer hidden">
+        <div class="timer-drawer-header">
+          <span class="font-semibold text-sm">Workout Rest Timer</span>
+          <button class="icon-btn-xs" id="close-timer-drawer">✕</button>
+        </div>
+        <div class="timer-drawer-display tabular-nums" id="rest-timer-clock">01:30</div>
+        <div class="timer-preset-row">
+          <button class="timer-preset-btn" data-seconds="30">30s</button>
+          <button class="timer-preset-btn" data-seconds="60">60s</button>
+          <button class="timer-preset-btn active" data-seconds="90">90s</button>
+          <button class="timer-preset-btn" data-seconds="120">120s</button>
+          <button class="timer-preset-btn" data-seconds="180">3m</button>
+        </div>
+        <div class="timer-drawer-actions">
+          <button class="btn btn-primary btn-sm w-full" id="btn-toggle-rest-timer">Start Timer</button>
+          <button class="btn btn-subtle btn-sm text-muted" id="btn-reset-rest-timer">Reset</button>
+        </div>
+      </div>
+
+      <!-- MODAL: FORMULA & SCIENTIFIC METHODOLOGY -->
+      <div id="modal-formula" class="modal-backdrop hidden">
+        <div class="modal-dialog">
+          <div class="modal-header">
+            <h3 class="modal-title">Scientific Formulation & Metabolic Methodology</h3>
+            <button class="icon-btn-xs modal-close-btn" data-close-modal="modal-formula">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="formula-section">
+              <h4>1. Basal Metabolic Rate (BMR)</h4>
+              <p>Calculated using the <strong>Mifflin–St Jeor equation</strong>, demonstrated in peer-reviewed clinical literature to be the most accurate predictive formula for normal and overweight individuals:</p>
+              <div class="formula-code-box">
+                <code>Male: BMR = (10 × weight in kg) + (6.25 × height in cm) - (5 × age) + 5</code><br>
+                <code>Female: BMR = (10 × weight in kg) + (6.25 × height in cm) - (5 × age) - 161</code>
+              </div>
+            </div>
+
+            <div class="formula-section">
+              <h4>2. Total Daily Energy Expenditure (TDEE)</h4>
+              <p>Calculated as <code>TDEE = BMR × Activity Multiplier</code> based on standard Physical Activity Levels (PAL):</p>
+              <ul class="formula-bullets">
+                <li><strong>Sedentary (1.2):</strong> Little to no structured physical movement.</li>
+                <li><strong>Lightly Active (1.375):</strong> Light daily movement or 1–3 gym sessions/week.</li>
+                <li><strong>Moderately Active (1.55):</strong> Active job or 3–5 training sessions/week.</li>
+                <li><strong>Very Active (1.725):</strong> Heavy physical occupation or 6–7 intense workouts/week.</li>
+                <li><strong>Extremely Active (1.9):</strong> Dual endurance/power training or extreme labor.</li>
+              </ul>
+            </div>
+
+            <div class="formula-section">
+              <h4>3. Body Mass Index (BMI) & Lean Body Mass</h4>
+              <div class="formula-code-box">
+                <code>BMI = Weight (kg) / [Height (m)]²</code><br>
+                <code>Lean Body Mass = Weight × (1 - [Body Fat % / 100])</code>
+              </div>
+              <p class="text-xs text-muted mt-2">Note: BMI does not differentiate between skeletal muscle and adipose tissue; body composition values are provided when Body Fat % is entered.</p>
+            </div>
+
+            <div class="formula-section">
+              <h4>4. Caloric Target Adjustments</h4>
+              <ul class="formula-bullets">
+                <li><strong>Fat Loss:</strong> Target = TDEE - 500 kcal (moderate 20% deficit, never below 1,200 kcal for females or 1,500 kcal for males).</li>
+                <li><strong>Muscle Gain:</strong> Target = TDEE + 250 to 350 kcal (~10–15% lean surplus).</li>
+                <li><strong>Body Recomposition:</strong> Target = TDEE - 100 to 0 kcal with elevated protein (2.0–2.4 g/kg).</li>
+              </ul>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary btn-sm" data-close-modal="modal-formula">Close</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL: EXERCISE SWAP ALTERNATIVE -->
+      <div id="modal-swap-exercise" class="modal-backdrop hidden">
+        <div class="modal-dialog">
+          <div class="modal-header">
+            <div>
+              <h3 class="modal-title">Select Exercise Alternative</h3>
+              <p class="text-xs text-muted" id="swap-modal-current">Current: Barbell Bench Press</p>
+            </div>
+            <button class="icon-btn-xs modal-close-btn" data-close-modal="modal-swap-exercise">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="swap-options-list" id="swap-alternatives-container">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary btn-sm" data-close-modal="modal-swap-exercise">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL: ADD CUSTOM FOOD / SWAP FOOD -->
+      <div id="modal-food" class="modal-backdrop hidden">
+        <div class="modal-dialog">
+          <div class="modal-header">
+            <div>
+              <h3 class="modal-title" id="food-modal-title">Select Food or Alternative</h3>
+              <p class="text-xs text-muted">Choose from our calibrated nutritional database or enter custom values.</p>
+            </div>
+            <button class="icon-btn-xs modal-close-btn" data-close-modal="modal-food">✕</button>
+          </div>
+          <div class="modal-body">
+            <!-- Search Database -->
+            <div class="search-input-wrapper mb-3">
+              <input type="text" id="food-search-query" class="form-input" placeholder="Search foods (e.g. oats, chicken, paneer, eggs, lentils)..." />
+            </div>
+
+            <!-- Categories Tabs -->
+            <div class="segmented-control mb-3" id="food-category-filter">
+              <button class="segment-btn active" data-category="all">All</button>
+              <button class="segment-btn" data-category="protein">Protein</button>
+              <button class="segment-btn" data-category="carbs">Carbs</button>
+              <button class="segment-btn" data-category="fats">Fats</button>
+              <button class="segment-btn" data-category="indian">Indian</button>
+            </div>
+
+            <!-- Database Food List -->
+            <div class="food-selection-list" id="food-selection-container">
+              <!-- List rendered dynamically -->
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary btn-sm" data-close-modal="modal-food">Close</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL: LOG PROGRESS ENTRY -->
+      <div id="modal-log-entry" class="modal-backdrop hidden">
+        <div class="modal-dialog">
+          <div class="modal-header">
+            <h3 class="modal-title">Record Daily Progress Entry</h3>
+            <button class="icon-btn-xs modal-close-btn" data-close-modal="modal-log-entry">✕</button>
+          </div>
+          <form id="form-log-progress" class="modal-body">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="log-date" class="form-label">Date <span class="required">*</span></label>
+                <input type="date" id="log-date" class="form-input" required />
+              </div>
+
+              <div class="form-group">
+                <label for="log-weight" class="form-label">Morning Weight (<span class="unit-label">kg</span>) <span class="required">*</span></label>
+                <input type="number" id="log-weight" class="form-input" min="30" max="300" step="0.1" required />
+              </div>
+
+              <div class="form-group">
+                <label for="log-bodyfat" class="form-label">Body Fat % <span class="optional-badge">Optional</span></label>
+                <input type="number" id="log-bodyfat" class="form-input" min="3" max="60" step="0.5" placeholder="Optional" />
+              </div>
+
+              <div class="form-group">
+                <label for="log-waist" class="form-label">Waist Circumference (<span class="unit-len-label">cm</span>)</label>
+                <input type="number" id="log-waist" class="form-input" min="40" max="200" step="0.5" placeholder="e.g. 81" />
+              </div>
+
+              <div class="form-group">
+                <label for="log-chest" class="form-label">Chest Circumference (<span class="unit-len-label">cm</span>)</label>
+                <input type="number" id="log-chest" class="form-input" min="40" max="200" step="0.5" placeholder="e.g. 102" />
+              </div>
+
+              <div class="form-group">
+                <label for="log-arms" class="form-label">Arms (<span class="unit-len-label">cm</span>)</label>
+                <input type="number" id="log-arms" class="form-input" min="20" max="70" step="0.5" placeholder="e.g. 38" />
+              </div>
+
+              <div class="form-group">
+                <label for="log-calories" class="form-label">Calories Consumed (kcal)</label>
+                <input type="number" id="log-calories" class="form-input" min="500" max="8000" placeholder="e.g. 2450" />
+              </div>
+
+              <div class="form-group">
+                <label for="log-protein" class="form-label">Protein Consumed (g)</label>
+                <input type="number" id="log-protein" class="form-input" min="10" max="500" placeholder="e.g. 165" />
+              </div>
+
+              <div class="form-group full-width">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="log-workout-done" checked />
+                  <span>Workout completed as planned today</span>
+                </label>
+              </div>
+
+              <div class="form-group full-width">
+                <label for="log-notes" class="form-label">Session Notes & Energy</label>
+                <input type="text" id="log-notes" class="form-input" placeholder="e.g. Felt strong on bench press; slept 8 hours" />
+              </div>
+            </div>
+            
+            <div class="modal-footer mt-4">
+              <button type="button" class="btn btn-secondary btn-sm" data-close-modal="modal-log-entry">Cancel</button>
+              <button type="submit" class="btn btn-primary btn-sm">Save Log Entry</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- TOAST NOTIFICATION CONTAINER -->
+      <div id="toast-container" class="toast-shelf" aria-live="polite"></div>
+
+    </div>
+
+    <!-- Main JavaScript Bundle -->
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>
